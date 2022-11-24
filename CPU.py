@@ -18,6 +18,8 @@ class Memory:
         data_to_store = [x.split(",") for x in data_to_add.read().splitlines()]
         self.blocks = len(data_to_store)
         self.data = data_to_store
+        for idx in range(0, self.blocks):
+            self.data[idx][0] = int(self.data[idx][0], 2)
         print(self.data)
     
     # Reads data within memory based on address
@@ -108,6 +110,16 @@ class CPU:
             self.instruction_register = self.main_memory.memory_read(self.instruction_address_register)
         else:
             self.instruction_register = self.cache.cache_read(self.instruction_address_register)
+    
+    def decode_instructions(self):
+        opcode = self.instruction_register[0:6]
+        print(opcode)
+    
+    def process(self):
+        self.instruction_address_register += 4
+        self.fetch_instructions()
+        self.decode_instructions()
+
         
     
 
@@ -115,11 +127,7 @@ class CPU:
 
 
 new_CPU = CPU()
-new_CPU.cache.cache_read("00000100")
-new_CPU.cache.cache_read("00001000")
-new_CPU.cache.cache_write("00001000", "test write successful")
-new_CPU.cache.cache_read("00010000")
-new_CPU.cache.cache_read("00010100")
-new_CPU.cache.cache_read("00011000")
-new_CPU.cache.cache_read("00011100")
-new_CPU.cache.cache_read("00001000")
+new_CPU.process()
+
+
+
