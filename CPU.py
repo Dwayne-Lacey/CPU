@@ -1,7 +1,7 @@
 import os, sys
 
 class Memory:
-    # Constructs memory with 14 blocks of memory to be used. Data for memory block is stored utilizing an index
+    # Constructs memory to be used. Data for memory block is stored utilizing an index
     def __init__(self):
         self.blocks = None
         self.data = None
@@ -17,7 +17,17 @@ class Memory:
         self.data = data_to_store
         print(self.data)
 
+class CPU:
+    def __init__(self):
+        self.storage_registers = ["" for x in range(0, 32)]
+        self.temp_register = None
+        self.instruction_address_register = 0
+        self.instruction_register = None
+        self.cache = 1
 
+        print(self.storage_registers)
 
 new_memory = Memory()
 new_memory.store_values()
+
+new_CPU = CPU()
