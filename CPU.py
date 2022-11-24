@@ -17,6 +17,12 @@ class Memory:
         self.data = data_to_store
         print(self.data)
 
+class Cache(Memory):
+    def __init__(self):
+        Memory.__init__()
+        self.blocks = 4
+        self.data = ["" for x in range(0, self.blocks)]
+
 class CPU:
     def __init__(self):
         self.storage_registers = ["" for x in range(0, 32)]
@@ -24,8 +30,13 @@ class CPU:
         self.instruction_address_register = 0
         self.instruction_register = None
         self.cache = 1
+        self.main_memory = Memory()
+        self.cache = Cache()
+        self.halt = 0
 
         print(self.storage_registers)
+    
+
 
 new_memory = Memory()
 new_memory.store_values()
