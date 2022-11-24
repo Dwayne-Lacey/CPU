@@ -18,8 +18,9 @@ class Memory:
         print(self.data)
 
 class Cache(Memory):
-    def __init__(self):
-        Memory.__init__()
+    def __init__(self, main_memory):
+        super().__init__()
+        self.main_memory = main_memory
         self.blocks = 4
         self.data = ["" for x in range(0, self.blocks)]
 
@@ -29,12 +30,19 @@ class CPU:
         self.temp_register = None
         self.instruction_address_register = 0
         self.instruction_register = None
-        self.cache = 1
-        self.main_memory = Memory()
+        self.cache_state = 1
+        self.main_memory = Memory(self.main_memory)
         self.cache = Cache()
         self.halt = 0
 
         print(self.storage_registers)
+    
+    def fetch_instructions(self):
+        if self.cache_state == 0:
+            self.instruction_register = self.main_memory.read(self.instruction_address_register)
+        else:
+            self.instruction_register = self.cache.read(self.instruction_address_register)
+        
     
 
 
