@@ -113,12 +113,19 @@ class CPU:
     
     def decode_instructions(self):
         opcode = self.instruction_register[0:6]
+        if opcode == '001000':
+            self.ADDI(opcode, self.instruction_register[6:11], self.instruction_register[11:17], self.instruction_register[17:-1])
         print(opcode)
     
     def process(self):
         self.instruction_address_register += 4
         self.fetch_instructions()
         self.decode_instructions()
+    
+    def ADDI(self, opcode, rs,  rt, immediate):
+        destination_register = int(rt, 2)
+        self.temp_register = int(rs, 2) + int(immediate, 2)
+        self.storage_registers[destination_register] = self.temp_register
 
         
     
