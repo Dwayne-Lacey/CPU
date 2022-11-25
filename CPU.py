@@ -109,6 +109,7 @@ class CPU:
         self.main_memory = Memory(name="main memory")
         self.cache = Cache(self.main_memory)
         self.halt = 0
+        self.run_instructions()
     
     def fetch_instructions(self):
         if self.cache_state == 0:
@@ -153,6 +154,10 @@ class CPU:
         self.fetch_instructions()
         self.decode_instructions()
     
+    def run_instructions(self):
+        while self.halt == 0:
+            self.process()
+    
     def ADDI(self, rs,  rt, immediate):
         destination_register = int(rt, 2)
         self.temp_register = self.storage_registers[int(rs, 2)] + int(immediate, 2)
@@ -163,13 +168,13 @@ class CPU:
         if self.storage_registers[int(rs, 2)] != self.storage_registers[int(rt, 2)]:
             self.instruction_address_register += 4
             self.instruction_address_register += int(offset, 2) * 4
-            self.fetch_instructions
-            self.decode_instructions
+            self.fetch_instructions()
+            self.decode_instructions()
 
     def JUMP(self, memory_address):
         self.instruction_address_register = int(memory_address, 2) * 4
-        self.fetch_instructions
-        self.decode_instructions
+        self.fetch_instructions()
+        self.decode_instructions()
 
     def JAL(self, memory_address):
         self.process()
@@ -177,23 +182,23 @@ class CPU:
     
     def LW(self, base, rt, offset):
         if self.cache_state == 0:
-            self.storage_registers[int(rt, 2)] = self.main_memory.memory_read(int(base, 2) + int(offset, 2))
+            self.storage_registers[int(rt, 2)] = int(self.main_memory.memory_read(int(base, 2) + int(offset, 2)), 2)
         else:
             print(int(base, 2), int(offset, 2))
-            self.storage_registers[int(rt, 2)] = self.cache.cache_read((int(base, 2) + int(offset, 2)))
+            self.storage_registers[int(rt, 2)] = int(self.cache.cache_read((int(base, 2) + int(offset, 2))), 2)
 
     def SW(self, base, rt, offset):
         if self.cache_state == 0:
-            self.main_memory.memory_write(int(base, 2) + int(offset, 2),)
+            self.main_memory.memory_write(int(base, 2) + int(offset, 2), self.storage_registers[int(rt, 2)])
         else:
             self.cache.cache_write(int(base, 2) + int(offset, 2), self.storage_registers[int(rt, 2)])
     
     def CACHE_F(self, code):
-        if int(code, 2) == 0:
+        if int(code) == 0:
             self.cache_state = 0
-        elif int(code, 2) == 1:
+        elif int(code) == 1:
             self.cache_state = 1
-        elif int(code, 2) == 2:
+        elif int(code) == 2:
             self.cache.flush_cache()
     
     def HALT(self):
@@ -217,7 +222,7 @@ class CPU:
 
 
 new_CPU = CPU()
-new_CPU.process()
+
 
 
 
