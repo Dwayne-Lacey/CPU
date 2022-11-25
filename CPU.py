@@ -91,6 +91,13 @@ class Cache(Memory):
                 if node == '':
                     self.data[idx] = [address, data]
                     return
+    
+    # Flushes out cache, writes all data currently stored within cache to main memory and then empties the cache
+    def flush_cache(self):
+        for idx, block in enumerate(self.data):
+            if block != '':
+                self.main_memory.memory_write(block[0], block[1])
+                self.data[idx] = ''
 
 class CPU:
     def __init__(self):
@@ -125,6 +132,8 @@ class CPU:
             self.LW(self.instruction_register[6:11], self.instruction_register[11:16])
         elif opcode == '101011':
             self.SW(self.instruction_register[6:11], self.instruction_register[11:16])
+        elif opcode == '101111':
+            self.CACHE_F(self.instruction_register[6:-1])
             
 
         print(opcode)
@@ -167,6 +176,14 @@ class CPU:
             self.main_memory.memory_write(int(base, 2) + int(offset, 2),)
         else:
             self.cache.cache_write(int(base, 2) + int(offset, 2), self.storage_registers[int(rt, 2)])
+    
+    def CACHE_f(self, code):
+        if int(code, 2) == 0:
+            self.cache_state = 0
+        elif int(code, 2) == 1:
+            self.cache_state = 1
+        elif int(code, 2) == 2:
+            self.cache.flush_cache()
 
         
     
