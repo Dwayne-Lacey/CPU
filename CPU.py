@@ -9,7 +9,7 @@ class Memory:
         print(self.data)
         if name == "main memory":
             self.store_values()
-    
+
     # Stores values within memory to be used
     def store_values(self):
         # Obtains working directory for program 
@@ -94,7 +94,7 @@ class Cache(Memory):
 
 class CPU:
     def __init__(self):
-        self.storage_registers = ["" for x in range(0, 32)]
+        self.storage_registers = [0 for x in range(0, 32)]
         self.temp_register = None
         self.instruction_address_register = 0
         self.instruction_register = None
@@ -115,6 +115,10 @@ class CPU:
         opcode = self.instruction_register[0:6]
         if opcode == '001000':
             self.ADDI(opcode, self.instruction_register[6:11], self.instruction_register[11:17], self.instruction_register[17:-1])
+        elif opcode == '000101':
+            self.BNE(opcode, self.instruction_register[6:11], self.instruction_register[11:17], self.instruction_register[17:-1])
+            
+
         print(opcode)
     
     def process(self):
@@ -124,8 +128,16 @@ class CPU:
     
     def ADDI(self, opcode, rs,  rt, immediate):
         destination_register = int(rt, 2)
-        self.temp_register = int(rs, 2) + int(immediate, 2)
+        self.temp_register = self.storage_registers[int(rs, 2)] + int(immediate, 2)
         self.storage_registers[destination_register] = self.temp_register
+        self.temp_register = None
+    
+    def BNE(self, opcode, rs, rt, offset):
+        if self.storage_registers[int(rs, 2)] != self.storage_registers[int(rt, 2)]:
+            self.instruction_address_register += 4
+            self.instruction_address_register += int(offset, 2) * 4
+            self.fetch_instructions
+            self.decode_instructions
 
         
     
