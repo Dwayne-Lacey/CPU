@@ -109,8 +109,6 @@ class CPU:
         self.main_memory = Memory(name="main memory")
         self.cache = Cache(self.main_memory)
         self.halt = 0
-
-        print(self.storage_registers)
     
     def fetch_instructions(self):
         if self.cache_state == 0:
@@ -123,23 +121,23 @@ class CPU:
         if len(self.instruction_register) < 32 or len(self.instruction_register) > 32:
             print("Invalid instruction length")
         elif opcode == '001000':
-            self.ADDI(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:-1])
+            self.ADDI(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:])
         elif opcode == '000101':
-            self.BNE(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:-1])
+            self.BNE(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:])
         elif opcode == '000010':
-            self.JUMP(self.instruction_register[6:-1])
+            self.JUMP(self.instruction_register[6:])
         elif opcode == '000011':
-            self.JAL(self.instruction_register[6:-1])
+            self.JAL(self.instruction_register[6:])
         elif opcode == '100011':
-            self.LW(self.instruction_register[6:11], self.instruction_register[11:16])
+            self.LW(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:])
         elif opcode == '101011':
-            self.SW(self.instruction_register[6:11], self.instruction_register[11:16])
+            self.SW(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:])
         elif opcode == '101111':
-            self.CACHE_F(self.instruction_register[6:-1])
+            self.CACHE_F(self.instruction_register[6:])
         elif opcode == '000001':
             self.HALT()
         elif opcode == '000000':
-            func = self.instruction_register[26:-1]
+            func = self.instruction_register[26:]
             rs = int(self.instruction_register[6:11], 2)
             rt = int(self.instruction_register[11:16], 2)
             rd = int(self.instruction_register[16:21], 2)
@@ -149,10 +147,6 @@ class CPU:
                 self.SUB(rs, rt, rd)
             elif func == '101010':
                 self.SLT(rs, rt, rd)
-
-            
-
-        print(opcode)
     
     def process(self):
         self.instruction_address_register += 4
@@ -185,7 +179,8 @@ class CPU:
         if self.cache_state == 0:
             self.storage_registers[int(rt, 2)] = self.main_memory.memory_read(int(base, 2) + int(offset, 2))
         else:
-            self.storage_registers[int(rt, 2)] = self.cache.cache_read(int(base, 2) + int(offset, 2))
+            print(int(base, 2), int(offset, 2))
+            self.storage_registers[int(rt, 2)] = self.cache.cache_read((int(base, 2) + int(offset, 2)))
 
     def SW(self, base, rt, offset):
         if self.cache_state == 0:
