@@ -120,7 +120,9 @@ class CPU:
     
     def decode_instructions(self):
         opcode = self.instruction_register[0:6]
-        if opcode == '001000':
+        if len(self.instruction_register) < 32 or len(self.instruction_register) > 32:
+            print("Invalid instruction length")
+        elif opcode == '001000':
             self.ADDI(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:-1])
         elif opcode == '000101':
             self.BNE(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:-1])
@@ -134,6 +136,20 @@ class CPU:
             self.SW(self.instruction_register[6:11], self.instruction_register[11:16])
         elif opcode == '101111':
             self.CACHE_F(self.instruction_register[6:-1])
+        elif opcode == '000001':
+            self.HALT()
+        elif opcode == '000000':
+            func = self.instruction_register[26:-1]
+            rs = int(self.instruction_register[6:11], 2)
+            rt = int(self.instruction_register[11:16], 2)
+            rd = int(self.instruction_register[16:21], 2)
+            if func == '100000':
+                self.ADD(rs, rt, rd)
+            elif func == '100010':
+                self.SUB(rs, rt, rd)
+            elif func == '101010':
+                self.SLT(rs, rt, rd)
+
             
 
         print(opcode)
@@ -177,14 +193,28 @@ class CPU:
         else:
             self.cache.cache_write(int(base, 2) + int(offset, 2), self.storage_registers[int(rt, 2)])
     
-    def CACHE_f(self, code):
+    def CACHE_F(self, code):
         if int(code, 2) == 0:
             self.cache_state = 0
         elif int(code, 2) == 1:
             self.cache_state = 1
         elif int(code, 2) == 2:
             self.cache.flush_cache()
+    
+    def HALT(self):
+        self.halt = 1
 
+    def ADD(self, rs, rt, rd):
+        self.storage_registers[rd] = self.storage_registers[rs] + self.storage_registers[rt]
+    
+    def SUB(self, rs, rt, rd):
+        self.storage_registers[rd] = self.storage_registers[rs] - self.storage_registers[rt]
+    
+    def SLT(self, rs, rt, rd):
+        if self.storage_registers[rs] < self.storage_registers[rt]:
+            self.storage_registers[rd] = 1
+        else:
+            self.storage_registers[rd] = 0
         
     
 
