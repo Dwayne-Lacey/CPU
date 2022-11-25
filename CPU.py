@@ -114,11 +114,17 @@ class CPU:
     def decode_instructions(self):
         opcode = self.instruction_register[0:6]
         if opcode == '001000':
-            self.ADDI(self.instruction_register[6:11], self.instruction_register[11:17], self.instruction_register[17:-1])
+            self.ADDI(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:-1])
         elif opcode == '000101':
-            self.BNE(self.instruction_register[6:11], self.instruction_register[11:17], self.instruction_register[17:-1])
+            self.BNE(self.instruction_register[6:11], self.instruction_register[11:16], self.instruction_register[16:-1])
         elif opcode == '000010':
-            self.JUMP(self.instruction_address_register[6:-1])
+            self.JUMP(self.instruction_register[6:-1])
+        elif opcode == '000011':
+            self.JAL(self.instruction_register[6:-1])
+        elif opcode == '100011':
+            self.LW(self.instruction_register[6:11], self.instruction_register[11:16])
+        elif opcode == '101011':
+            self.SW(self.instruction_register[6:11], self.instruction_register[11:16])
             
 
         print(opcode)
@@ -145,6 +151,23 @@ class CPU:
         self.instruction_address_register = int(memory_address, 2) * 4
         self.fetch_instructions
         self.decode_instructions
+
+    def JAL(self, memory_address):
+        self.process()
+        self.JUMP(memory_address)
+    
+    def LW(self, base, rt, offset):
+        if self.cache_state == 0:
+            self.storage_registers[int(rt, 2)] = self.main_memory.memory_read(int(base, 2) + int(offset, 2))
+        else:
+            self.storage_registers[int(rt, 2)] = self.cache.cache_read(int(base, 2) + int(offset, 2))
+
+    def SW(self, base, rt, offset):
+        if self.cache_state == 0:
+            self.main_memory.memory_write(int(base, 2) + int(offset, 2),)
+        else:
+            self.cache.cache_write(int(base, 2) + int(offset, 2), self.storage_registers[int(rt, 2)])
+
         
     
 
